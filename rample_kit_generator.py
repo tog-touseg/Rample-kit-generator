@@ -260,7 +260,7 @@ sp4_tree.grid(row=3,column=5,sticky=tk.N, padx=padding,pady=padding)
 
 Label(window, text="RAMPLE kit generator", font=label_font).grid(row=0,column=2, sticky='s')
 
-help_text = Label(window, text="keyboard shortcuts description", justify='left', fg='#FF0000').grid(row=5,column=0, columnspan=4, sticky='w', padx=padding, pady=padding)
+help_text = Label(window, text="keyboard shortcuts description", justify='left', fg='#FF00FF').grid(row=5,column=0, columnspan=4, sticky='w', padx=padding, pady=padding)
 save_text = Label(window, text="saved message", justify='right', fg='#00AA00').grid(row=5,column=4, columnspan=2, sticky='e', padx=padding, pady=padding)
 
 
