@@ -24,6 +24,7 @@ selected_sample = ''
 orig_path = ''
 orig_file = ''
 selected_layer = ''
+init_path = ''
 
 def edit(event):
     tree = event.widget
@@ -34,18 +35,19 @@ def edit(event):
             """Change item value."""
             tree.set(item, column, entry.get())
             entry.destroy()
-            if tree == sp1_tree:
-                offset = 12
-            elif tree == sp2_tree:
-                offset = 36
-            elif tree == sp3_tree:
-                offset = 60
-            elif tree == sp4_tree:
-                offset = 84
+            if tree in sp_trees:
+                if tree == sp1_tree:
+                    offset = 12
+                elif tree == sp2_tree:
+                    offset = 36
+                elif tree == sp3_tree:
+                    offset = 60
+                elif tree == sp4_tree:
+                    offset = 84
 
-            data[selected_kit][int(layer)-1+offset] = tree.set(item, column)
-            # with open(os.getcwd() + '/kit_data.pkl', 'wb') as handle:
-            #     pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                data[selected_kit][int(layer)-1+offset] = tree.set(item, column)
+            else:
+                data[selected_kit][-1] = tree.set(item, column)
 
         it = tree.focus()
         it = tree.item(it)
@@ -136,7 +138,7 @@ def generate_tree(path,parent,tree):
 
 
 window = Tk()
-window.geometry('885x660+700+200')
+window.geometry('885x680+700+200')
 window.resizable(False, False)
 # window.configure(bg='black')
 # window.columnconfigure(0, weight=1)
@@ -170,18 +172,11 @@ kits_tree.heading('tag', text='Tag')
 
 kits_tree.column("kit", minwidth=0, width=50, stretch=NO)
 kits_tree.column("tag", minwidth=0, width=100, stretch=NO)
-
 kits = []
 alpha = list(string.ascii_uppercase)
 for a in alpha:
     for x in range(10):
-        kits.append((a + str(x), ' '))
-
-for i in kits:
-    kits_tree.insert('', 'end', values=i) #text=str(i))
-
-vsb2 = ttk.Scrollbar(window, orient="vertical", command=kits_tree.yview)
-kits_tree.configure(yscrollcommand=vsb2.set)
+        kits.append((a + str(x), ''))
 
 data_path = os.getcwd() + '/kit_data.pkl'
 if os.path.exists(data_path):
@@ -194,13 +189,24 @@ else:
     data = {}
     for e in kits:
         data[e[0]] = ['']*12*2*4
+        data[e[0]].append('')
+
     
-    data['memory'] = [os.getcwd()] 
+    data['memory'] = [os.getcwd()]
+    init_path = data['memory'][0]
     with open(os.getcwd() + '/kit_data.pkl', 'wb') as handle:
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 create_explorer_tree(init_path)
+
+for i in kits:
+    x = list(i)
+    x[-1] = data[i[0]][-1]
+    kits_tree.insert('', 'end', values=x) #text=str(i))
+
+vsb2 = ttk.Scrollbar(window, orient="vertical", command=kits_tree.yview)
+kits_tree.configure(yscrollcommand=vsb2.set)
 
 child_id = kits_tree.get_children()[0]
 kits_tree.focus(child_id)
@@ -260,8 +266,16 @@ sp4_tree.grid(row=3,column=5,sticky=tk.N, padx=padding,pady=padding)
 
 Label(window, text="RAMPLE kit generator", font=label_font).grid(row=0,column=2, sticky='s')
 
-help_text = Label(window, text="keyboard shortcuts description", justify='left', fg='#FF00FF').grid(row=5,column=0, columnspan=4, sticky='w', padx=padding, pady=padding)
-save_text = Label(window, text="saved message", justify='right', fg='#00AA00').grid(row=5,column=4, columnspan=2, sticky='e', padx=padding, pady=padding)
+help_text = Label(window, text="A, Z, E and R: copy sample to SP1, SP2, SP3, SP4\nMouse wheel: move sample in sample track\nRight click: remove sample from sample track", justify='left', fg='#000000').grid(row=5,column=0, columnspan=4, sticky='w', padx=padding, pady=padding)
+
+
+from datetime import datetime
+now = datetime.now()
+now.strftime("%H:%M:%S")
+
+timestamp = StringVar()
+timestamp.set('')
+save_text = Label(window, textvariable=timestamp, justify='right', fg='#00AA00').grid(row=5,column=4, columnspan=2, sticky='e', padx=padding, pady=padding)
 
 
 def browse_button():
@@ -289,19 +303,22 @@ def copy_sample(layer, order, source, dest, new_name):
 def save_button():
 
     with open(os.getcwd() + '/kit_data.pkl', 'wb') as handle:
-                pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     save_path = os.getcwd()
-    shutil.rmtree(save_path + '/kits/')
+    if os.path.exists(save_path + "/kits/"):
+        shutil.rmtree(save_path + '/kits/')
 
     for e in data:
+        if e == 'memory':
+            continue
+
         count = 0
         for s in data[e]:
             if s == '':
                 count = count + 1
 
         if count < 12*2*4:
-            
             if not os.path.exists(save_path + "/kits"):
                 os.makedirs(save_path + "/kits")
             if not os.path.exists(save_path + "/kits/" + e):
@@ -313,6 +330,8 @@ def save_button():
                 copy_sample(3, i, data[e][i+46], save_path + "/kits/" + e + "/", data[e][i+60])
                 copy_sample(4, i, data[e][i+72], save_path + "/kits/" + e + "/", data[e][i+84])
 
+    now = datetime.now()
+    timestamp.set("Last save: " + now.strftime("%H:%M:%S"))
 
 folder_path = StringVar()
 # load_lbl = Label(master=window,textvariable=folder_path)
