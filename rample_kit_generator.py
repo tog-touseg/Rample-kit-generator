@@ -188,6 +188,8 @@ if os.path.exists(data_path):
     with open(os.getcwd() + '/kit_data.pkl', 'rb') as handle:
         data = pickle.load(handle)
         init_path = data['memory'][0]
+        if not os.path.exists(init_path):
+            init_path = os.getcwd()
 else:
     data = {}
     for e in kits:
