@@ -16,7 +16,7 @@ import pickle
 #   print(url_string)
 
 # check extension (wav mp3 flac)
-# autofocus on last selected on sp_tree 
+# save kit tag
 
 idx = 0
 selected_kit = 'A0'
@@ -195,7 +195,7 @@ else:
     for e in kits:
         data[e[0]] = ['']*12*2*4
     
-    data['memory'] = [os.getcwd()]
+    data['memory'] = [os.getcwd()] 
     with open(os.getcwd() + '/kit_data.pkl', 'wb') as handle:
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
