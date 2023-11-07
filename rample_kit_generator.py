@@ -175,7 +175,7 @@ kits_tree.column("tag", minwidth=0, width=100, stretch=NO)
 kits = []
 alpha = list(string.ascii_uppercase)
 for a in alpha:
-    for x in range(10):
+    for x in range(20):
         kits.append((a + str(x), ''))
 
 data_path = os.getcwd() + '/kit_data.pkl'
