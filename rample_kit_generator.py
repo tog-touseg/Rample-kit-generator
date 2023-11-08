@@ -123,10 +123,13 @@ def update_tree(tree, offset):
     for x in content:
         tree.insert('', 'end', values=x)
 
+file_type = ['wav', 'mp3', 'ogg']
+
 def generate_tree(path,parent,tree):    
     for p in reversed(sorted(os.listdir(path))):
         abspath = os.path.join(path, p)
-        if ".wav" in p:
+        file_ext = p.split('.')[-1]
+        if file_ext in file_type:
             global idx
             idx = idx + 1
             if idx % 2:
