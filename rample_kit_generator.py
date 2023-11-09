@@ -143,7 +143,7 @@ def generate_tree(path,parent,tree):
 
 
 window = Tk()
-window.geometry('885x680+700+200')
+window.geometry('1000x680+700+200')
 window.resizable(False, False)
 # window.configure(bg='black')
 # window.columnconfigure(0, weight=1)
@@ -156,12 +156,19 @@ explorer_tree.tag_configure('even', background='#DFDFDF')
 
 vsb1 = ttk.Scrollbar(window, orient="vertical", command=explorer_tree.yview)
 explorer_tree.configure(yscrollcommand=vsb1.set)
-explorer_tree.heading("#0" ,text="Explorer")
+explorer_tree.heading("#0", text="    Explorer", anchor='w')
+
+hsb1 = ttk.Scrollbar(window, orient="horizontal", command=explorer_tree.xview)
+explorer_tree.configure(xscrollcommand=hsb1.set)
+# explorer_tree.heading("#0" ,text="Explorer")
 
 def create_explorer_tree(path):
     # tree.pack(expand=YES,fill=BOTH)
     root = explorer_tree.insert('', 'end', text=path.split('/')[-1], open=True)
     generate_tree(path,root,explorer_tree)
+
+explorer_tree.column("#0",minwidth=1000, width=300, stretch=True)
+# explorer_tree.column("#0", stretch=False)
 
 # init_path = '/home/morgane/Bureau/Pulsar_23_Samples'
 # init_path = os.getcwd()
@@ -250,24 +257,25 @@ sp_trees = [sp1_tree, sp2_tree, sp3_tree, sp4_tree]
 
 padding = 5
 kits_tree.grid(column=0, row=1, rowspan=3, sticky=tk.N+tk.S, padx=padding, pady=padding)
-explorer_tree.grid(column=2, row=1, rowspan=3, sticky=tk.N+tk.S, padx=padding, pady=padding)
-vsb1.grid(row=1, column=3, rowspan=3, sticky='ns')
+explorer_tree.grid(column=2, row=1, rowspan=3,  sticky='NSEW', padx=padding, pady=padding)
+vsb1.grid(row=1, column=4, rowspan=3, sticky='ns')
+hsb1.grid(row=4, column=2, sticky='ew')
 vsb2.grid(row=1, column=1, rowspan=3, sticky='ns')
 
 from tkinter import font
 label_font = font.Font(weight="bold")
 
-Label(window, text="SP1").grid(row=0,column=4)
-sp1_tree.grid(row=1,column=4,sticky=tk.N, padx=padding,pady=padding)
+Label(window, text="SP1").grid(row=0,column=5)
+sp1_tree.grid(row=1,column=5,sticky=tk.N, padx=padding,pady=padding)
 
-Label(window, text="SP2").grid(row=0,column=5)
-sp2_tree.grid(row=1,column=5,sticky=tk.N, padx=padding,pady=padding)
+Label(window, text="SP2").grid(row=0,column=6)
+sp2_tree.grid(row=1,column=6,sticky=tk.N, padx=padding,pady=padding)
 
-Label(window, text="SP3").grid(row=2,column=4, sticky='s')
-sp3_tree.grid(row=3,column=4,sticky=tk.N, padx=padding,pady=padding)
+Label(window, text="SP3").grid(row=2,column=5, sticky='s')
+sp3_tree.grid(row=3,column=5,sticky=tk.N, padx=padding,pady=padding)
 
-Label(window, text="SP4").grid(row=2,column=5, sticky='s')
-sp4_tree.grid(row=3,column=5,sticky=tk.N, padx=padding,pady=padding)
+Label(window, text="SP4").grid(row=2,column=6, sticky='s')
+sp4_tree.grid(row=3,column=6,sticky=tk.N, padx=padding,pady=padding)
 
 Label(window, text="RAMPLE kit generator", font=label_font).grid(row=0,column=2, sticky='s')
 
@@ -342,10 +350,10 @@ folder_path = StringVar()
 # load_lbl = Label(master=window,textvariable=folder_path)
 # load_lbl.grid(row=4, column=1)
 load_btn = Button(text="Browse", command=browse_button)
-load_btn.grid(row=4, column=2)
+load_btn.grid(row=4, column=5)
 
 load_btn = Button(text="Save", command=save_button)
-load_btn.grid(row=4, column=5, sticky=tk.E)
+load_btn.grid(row=4, column=6, sticky=tk.E)
 
 def select_layer(event):
     # selected_layer = n + tree
