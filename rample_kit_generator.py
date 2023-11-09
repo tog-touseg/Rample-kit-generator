@@ -10,6 +10,7 @@ import string
 from tkinter import filedialog
 import shutil
 import pickle
+import soundfile as sf
 
 # from urlparse import urlparse
 # path = urlparse(url_string).path
@@ -78,8 +79,11 @@ def explorer_select(event):
 
     if 'sample' in tags:
         sa.stop_all()
-        wave_obj = sa.WaveObject.from_wave_file(tags[1])
+        snd, samplerate = sf.read(tags[1])
+        sf.write(os.getcwd() + '/tmp.wav', snd, samplerate, subtype='PCM_16')
+        wave_obj = sa.WaveObject.from_wave_file(os.getcwd() + '/tmp.wav')
         wave_obj.play()
+
         global orig_path
         global orig_file
         global selected_sample
@@ -376,7 +380,10 @@ def select_layer(event):
     sample = data[selected_kit][int(value)+offset-1]
     if sample != '':
         sa.stop_all()
-        wave_obj = sa.WaveObject.from_wave_file(sample)
+        snd, samplerate = sf.read(sample)
+
+        sf.write(os.getcwd() + '/tmp.wav', snd, samplerate, subtype='PCM_16')
+        wave_obj = sa.WaveObject.from_wave_file(os.getcwd() + '/tmp.wav')
         wave_obj.play()
 
 def delete_layer(event):
