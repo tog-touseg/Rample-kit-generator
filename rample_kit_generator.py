@@ -533,8 +533,8 @@ def enter(event):
         selected_layer = 0
 
 
-kits_tree.tag_configure('not_empty_odd', background='#ffe680')
-kits_tree.tag_configure('not_empty_even', background='#ffd42a')
+kits_tree.tag_configure('not_empty_odd', background='#ffd42a')
+kits_tree.tag_configure('not_empty_even', background='#ffe680')
 kits_tree.tag_configure('empty', background='#FFFFFF')
 
 sp1_tree.tag_configure('odd', background='#5fd3bc')
