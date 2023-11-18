@@ -12,14 +12,6 @@ import shutil
 import pickle
 import soundfile as sf
 
-# from urlparse import urlparse
-# path = urlparse(url_string).path
-# ext = os.path.splitext(path)[1]
-# if ext in extensionsToCheck:
-#   print(url_string)
-
-# if kit is not empty, color the #column
-
 idx = 0
 selected_kit = 0
 selected_sample = ''
@@ -138,12 +130,14 @@ def update_tree(tree, offset):
     for x in content:
         tree.insert('', 'end', values=x)
 
-file_type = ['wav', 'mp3', 'ogg']
+file_type = ['.wav', '.mp3', '.ogg']
 
 def generate_tree(path,parent,tree):    
     for p in reversed(sorted(os.listdir(path))):
         abspath = os.path.join(path, p)
-        file_ext = p.split('.')[-1]
+        file_ext = os.path.splitext(p)[1]
+        print(file_ext)
+        # file_ext = p.split('.')[-1]
         if file_ext in file_type:
             global idx
             idx = idx + 1
