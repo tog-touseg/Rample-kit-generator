@@ -28,14 +28,19 @@ orig_path = ''
 orig_file = ''
 selected_layer = ''
 init_path = ''
+text_editing = False
 
 def edit(event):
     tree = event.widget
     if (tree == kits_tree and tree.identify_column(event.x) == '#2') or (tree in sp_trees and tree.identify_column(event.x) == '#3') :
+        global text_editing
+        text_editing = True
         # the user clicked on a cell
 
         def ok(event):
             """Change item value."""
+            global text_editing
+            text_editing = False
             tree.set(item, column, entry.get())
             entry.destroy()
             if tree in sp_trees:
@@ -88,7 +93,7 @@ def explorer_select(event):
         global orig_file
         global selected_sample
         orig_path = tags[1]
-        orig_file = orig_path.split("/")[-1]
+        orig_file = orig_path.split(os.sep)[-1]
         selected_sample = orig_file
 
 def kit_select(event):
@@ -105,10 +110,10 @@ def kit_select(event):
     content4 = []
 
     for x in range(12):
-        content1.append((str(x+1), data[selected_kit][x].split('/')[-1], data[selected_kit][x+12]))
-        content2.append((str(x+1), data[selected_kit][x+24].split('/')[-1], data[selected_kit][x+36]))
-        content3.append((str(x+1), data[selected_kit][x+48].split('/')[-1], data[selected_kit][x+60]))
-        content4.append((str(x+1), data[selected_kit][x+72].split('/')[-1], data[selected_kit][x+84]))
+        content1.append((str(x+1), data[selected_kit][x].split(os.sep)[-1], data[selected_kit][x+12]))
+        content2.append((str(x+1), data[selected_kit][x+24].split(os.sep)[-1], data[selected_kit][x+36]))
+        content3.append((str(x+1), data[selected_kit][x+48].split(os.sep)[-1], data[selected_kit][x+60]))
+        content4.append((str(x+1), data[selected_kit][x+72].split(os.sep)[-1], data[selected_kit][x+84]))
 
     for idx, x in enumerate(content1):
         sp1_tree.insert('', 'end', values=content1[idx])
@@ -122,7 +127,7 @@ def update_tree(tree, offset):
 
     content = []
     for x in range(12):
-        content.append((str(x+1), data[selected_kit][x+offset].split('/')[-1], data[selected_kit][x+12+offset]))
+        content.append((str(x+1), data[selected_kit][x+offset].split(os.sep)[-1], data[selected_kit][x+12+offset]))
 
     for x in content:
         tree.insert('', 'end', values=x)
@@ -168,7 +173,7 @@ explorer_tree.configure(xscrollcommand=hsb1.set)
 
 def create_explorer_tree(path):
     # tree.pack(expand=YES,fill=BOTH)
-    root = explorer_tree.insert('', 'end', text=path.split('/')[-1], open=True)
+    root = explorer_tree.insert('', 'end', text=path.split(os.sep)[-1], open=True)
     generate_tree(path,root,explorer_tree)
 
 explorer_tree.column("#0",minwidth=1000, width=300, stretch=True)
@@ -262,9 +267,9 @@ sp_trees = [sp1_tree, sp2_tree, sp3_tree, sp4_tree]
 padding = 5
 kits_tree.grid(column=0, row=1, rowspan=3, sticky=tk.N+tk.S, padx=padding, pady=padding)
 explorer_tree.grid(column=2, row=1, rowspan=3,  sticky='NSEW', padx=padding, pady=padding)
-vsb1.grid(row=1, column=4, rowspan=3, sticky='ns')
+vsb1.grid(row=1, column=4, rowspan=3, sticky='ens')
 hsb1.grid(row=4, column=2, sticky='ew')
-vsb2.grid(row=1, column=1, rowspan=3, sticky='ns')
+vsb2.grid(row=1, column=1, rowspan=3, sticky='ens')
 
 from tkinter import font
 label_font = font.Font(weight="bold")
@@ -312,7 +317,7 @@ def browse_button():
 def copy_sample(layer, order, source, dest, new_name):
     if source != '':
         if new_name == '':
-            name = source.split('/')[-1]
+            name = source.split(os.sep)[-1]
             shutil.copy(source, dest + str(layer) + " l" + str(order+1) + " " + name)
         else:
             shutil.copy(source, dest + str(layer) + " l" + str(order+1) + " " + new_name + ".wav")
@@ -519,19 +524,27 @@ def insert_sample(tree):
             print(msg + 'FULL')
 
 def key_pressed(event):
-    match event.keysym:
-        case 'a':
-            insert_sample(sp1_tree)
-        case 'z':
-            insert_sample(sp2_tree)
-        case 'e':
-            insert_sample(sp3_tree)
-        case 'r':
-            insert_sample(sp4_tree)
-                
-        case '_':
-            pass
+    if not text_editing:
+        match event.keysym:
+            case 'a':
+                insert_sample(sp1_tree)
+            case 'z':
+                insert_sample(sp2_tree)
+            case 'e':
+                insert_sample(sp3_tree)
+            case 'r':
+                insert_sample(sp4_tree)
+                    
+            case '_':
+                pass
 
 window.bind('<Key>', key_pressed)
+
+# for row in range(7):
+#     window.grid_rowconfigure(row, weight=1)
+# window.grid_columnconfigure(0, weight=1)
+# window.grid_columnconfigure(2, weight=1)
+# window.grid_columnconfigure(4, weight=1)
+# window.grid_columnconfigure(5, weight=1)
 
 window.mainloop()
