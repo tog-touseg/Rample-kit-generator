@@ -100,35 +100,49 @@ def kit_select(event):
     
     
     for e in sp_trees:
+        if e == sp1_tree:
+            offset = 0
+        elif e == sp2_tree:
+            offset = 24
+        elif e == sp3_tree:
+            offset = 48
+        elif e == sp4_tree:
+            offset = 72
         e.delete(*e.get_children())
+        update_tree(e, offset)
 
-    content1 = []
-    content2 = []
-    content3 = []
-    content4 = []
+    # content1 = []
+    # content2 = []
+    # content3 = []
+    # content4 = []
 
-    for x in range(12):
-        content1.append((str(x+1), data[selected_kit][x].split(os.sep)[-1], data[selected_kit][x+12]))
-        content2.append((str(x+1), data[selected_kit][x+24].split(os.sep)[-1], data[selected_kit][x+36]))
-        content3.append((str(x+1), data[selected_kit][x+48].split(os.sep)[-1], data[selected_kit][x+60]))
-        content4.append((str(x+1), data[selected_kit][x+72].split(os.sep)[-1], data[selected_kit][x+84]))
+    # for x in range(12):
+    #     content1.append((str(x+1), data[selected_kit][x].split(os.sep)[-1], data[selected_kit][x+12]))
+    #     content2.append((str(x+1), data[selected_kit][x+24].split(os.sep)[-1], data[selected_kit][x+36]))
+    #     content3.append((str(x+1), data[selected_kit][x+48].split(os.sep)[-1], data[selected_kit][x+60]))
+    #     content4.append((str(x+1), data[selected_kit][x+72].split(os.sep)[-1], data[selected_kit][x+84]))
 
-    for idx, x in enumerate(content1):
-        sp1_tree.insert('', 'end', values=content1[idx])
-        sp2_tree.insert('', 'end', values=content2[idx])
-        sp3_tree.insert('', 'end', values=content3[idx])
-        sp4_tree.insert('', 'end', values=content4[idx])
+    # for idx, x in enumerate(content1):
+    #     sp1_tree.insert('', 'end', values=content1[idx])
+    #     sp2_tree.insert('', 'end', values=content2[idx])
+    #     sp3_tree.insert('', 'end', values=content3[idx])
+    #     sp4_tree.insert('', 'end', values=content4[idx])
 
 
 def update_tree(tree, offset):
     tree.delete(*tree.get_children())
-
     content = []
     for x in range(12):
         content.append((str(x+1), data[selected_kit][x+offset].split(os.sep)[-1], data[selected_kit][x+12+offset]))
 
-    for x in content:
-        tree.insert('', 'end', values=x)
+    for i, x in enumerate(content):
+        if content[i][1] != '':
+            if i % 2:
+                tree.insert('', 'end', values=x, tags='odd')
+            else:
+                tree.insert('', 'end', values=x, tags='even')
+        else:
+            tree.insert('', 'end', values=x, tags='empty')
 
 file_type = ['.wav', '.mp3', '.ogg']
 
@@ -136,7 +150,6 @@ def generate_tree(path,parent,tree):
     for p in reversed(sorted(os.listdir(path))):
         abspath = os.path.join(path, p)
         file_ext = os.path.splitext(p)[1]
-        print(file_ext)
         # file_ext = p.split('.')[-1]
         if file_ext in file_type:
             global idx
@@ -244,16 +257,6 @@ def set_kit_color(kit):
         kits_tree.item(kits_tree.focus(), tags='empty')
         return 'empty'
 
-
-def update_kits(tree, kit):
-    tree.delete(*tree.get_children())
-
-    # content = []
-    # for x in range(12):
-    #     content.append((str(x+1), data[selected_kit][x+offset].split(os.sep)[-1], data[selected_kit][x+12+offset]))
-
-    # for x in content:
-    #     tree.insert('', 'end', values=x)
 
 for idx, k in enumerate(kits):
     x = list(k)
@@ -533,6 +536,22 @@ def enter(event):
 kits_tree.tag_configure('not_empty_odd', background='#ffe680')
 kits_tree.tag_configure('not_empty_even', background='#ffd42a')
 kits_tree.tag_configure('empty', background='#FFFFFF')
+
+sp1_tree.tag_configure('odd', background='#5fd3bc')
+sp1_tree.tag_configure('even', background='#afe9dd')
+sp1_tree.tag_configure('empty', background='#ffffff')
+
+sp2_tree.tag_configure('odd', background='#5fbcd3')
+sp2_tree.tag_configure('even', background='#afdde9')
+sp2_tree.tag_configure('empty', background='#ffffff')
+
+sp3_tree.tag_configure('odd', background='#8dd35f')
+sp3_tree.tag_configure('even', background='#c6e9af')
+sp3_tree.tag_configure('empty', background='#ffffff')
+
+sp4_tree.tag_configure('odd', background='#de87aa')
+sp4_tree.tag_configure('even', background='#e9afc6')
+sp4_tree.tag_configure('empty', background='#ffffff')
 
 explorer_tree.bind('<<TreeviewSelect>>', explorer_select)
 kits_tree.bind('<<TreeviewSelect>>', kit_select)
