@@ -392,7 +392,7 @@ def save_button():
                 p = os.path.join(save_path, 'kits', to_save, '')
                 copy_sample(1, i, data[e][i], p, data[e][i+12])
                 copy_sample(2, i, data[e][i+24], p, data[e][i+36])
-                copy_sample(3, i, data[e][i+46], p, data[e][i+60])
+                copy_sample(3, i, data[e][i+48], p, data[e][i+60])
                 copy_sample(4, i, data[e][i+72], p, data[e][i+84])
 
     now = datetime.now()
