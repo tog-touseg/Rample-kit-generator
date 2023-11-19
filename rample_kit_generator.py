@@ -312,16 +312,16 @@ vsb2.grid(row=1, column=1, rowspan=3, sticky='ens')
 from tkinter import font
 label_font = font.Font(weight="bold")
 
-Label(window, text="SP1").grid(row=0,column=5)
+Label(window, text="SP1 (A)").grid(row=0,column=5)
 sp1_tree.grid(row=1,column=5,sticky=tk.N, padx=padding,pady=padding)
 
-Label(window, text="SP2").grid(row=0,column=6)
+Label(window, text="SP2 (Z)").grid(row=0,column=6)
 sp2_tree.grid(row=1,column=6,sticky=tk.N, padx=padding,pady=padding)
 
-Label(window, text="SP3").grid(row=2,column=5, sticky='s')
+Label(window, text="SP3 (E)").grid(row=2,column=5, sticky='s')
 sp3_tree.grid(row=3,column=5,sticky=tk.N, padx=padding,pady=padding)
 
-Label(window, text="SP4").grid(row=2,column=6, sticky='s')
+Label(window, text="SP4 (R)").grid(row=2,column=6, sticky='s')
 sp4_tree.grid(row=3,column=6,sticky=tk.N, padx=padding,pady=padding)
 
 Label(window, text="RAMPLE kit generator", font=label_font).grid(row=0,column=2, sticky='s')
@@ -456,6 +456,13 @@ def delete_layer(event):
     set_kit_color(selected_kit)
 
 
+def mouse_wheel(event):
+    # respond to Linux or Windows wheel event
+    if event.num == 5 or event.delta == -120:
+        mouse_wheel_down(event)
+    if event.num == 4 or event.delta == 120:
+        mouse_wheel_up(event)
+
 def mouse_wheel_up(event):
     tree = event.widget
     global selected_layer
@@ -560,8 +567,9 @@ for e in sp_trees:
     e.bind('<Double-1>', edit)
     e.bind('<Button-1>', select_layer)
     e.bind('<Button-3>', delete_layer)
-    e.bind('<Button-4>', mouse_wheel_up)
-    e.bind('<Button-5>', mouse_wheel_down)
+    e.bind('<MouseWheel>', mouse_wheel)
+    e.bind('<Button-4>', mouse_wheel)
+    e.bind('<Button-5>', mouse_wheel)
     e.bind('<Enter>', enter)
 
 def insert_sample(tree):
