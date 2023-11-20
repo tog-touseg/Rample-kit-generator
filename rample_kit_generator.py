@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 from tkinter import *
 from tkinter import ttk
@@ -11,18 +11,11 @@ from tkinter import filedialog
 import shutil
 import pickle
 import soundfile as sf
-
-# from urlparse import urlparse
-# path = urlparse(url_string).path
-# ext = os.path.splitext(path)[1]
-# if ext in extensionsToCheck:
-#   print(url_string)
-
-# check extension (wav mp3 flac)
-# save kit tag
+# import ttkbootstrap as ttk
+# from ttkbootstrap.constants import *
 
 idx = 0
-selected_kit = 'A0'
+selected_kit = 0
 selected_sample = ''
 orig_path = ''
 orig_file = ''
@@ -32,7 +25,7 @@ text_editing = False
 
 def edit(event):
     tree = event.widget
-    if (tree == kits_tree and tree.identify_column(event.x) == '#2') or (tree in sp_trees and tree.identify_column(event.x) == '#3') :
+    if (tree == kits_tree and (tree.identify_column(event.x) == '#2' or tree.identify_column(event.x) == '#3')) or (tree in sp_trees and tree.identify_column(event.x) == '#3') :
         global text_editing
         text_editing = True
         # the user clicked on a cell
@@ -55,7 +48,11 @@ def edit(event):
 
                 data[selected_kit][int(layer)-1+offset] = tree.set(item, column)
             else:
-                data[selected_kit][-1] = tree.set(item, column)
+                if column == '#2':
+                    data[selected_kit][-2] = tree.set(item, column)
+                else:
+                    data[selected_kit][-1] = tree.set(item, column)
+                # add tag name to data
 
         it = tree.focus()
         it = tree.item(it)
@@ -85,8 +82,9 @@ def explorer_select(event):
     if 'sample' in tags:
         sa.stop_all()
         snd, samplerate = sf.read(tags[1])
-        sf.write(os.getcwd() + '/tmp.wav', snd, samplerate, subtype='PCM_16')
-        wave_obj = sa.WaveObject.from_wave_file(os.getcwd() + '/tmp.wav')
+        tmp = os.path.join(os.getcwd(), 'tmp.wav')
+        sf.write(tmp, snd, samplerate, subtype='PCM_16')
+        wave_obj = sa.WaveObject.from_wave_file(tmp)
         wave_obj.play()
 
         global orig_path
@@ -101,43 +99,60 @@ def kit_select(event):
     values = event.widget.item(curr_item)['values']
     global selected_kit
     selected_kit = values[0]
+    
+    
     for e in sp_trees:
+        if e == sp1_tree:
+            offset = 0
+        elif e == sp2_tree:
+            offset = 24
+        elif e == sp3_tree:
+            offset = 48
+        elif e == sp4_tree:
+            offset = 72
         e.delete(*e.get_children())
+        update_tree(e, offset)
 
-    content1 = []
-    content2 = []
-    content3 = []
-    content4 = []
+    # content1 = []
+    # content2 = []
+    # content3 = []
+    # content4 = []
 
-    for x in range(12):
-        content1.append((str(x+1), data[selected_kit][x].split(os.sep)[-1], data[selected_kit][x+12]))
-        content2.append((str(x+1), data[selected_kit][x+24].split(os.sep)[-1], data[selected_kit][x+36]))
-        content3.append((str(x+1), data[selected_kit][x+48].split(os.sep)[-1], data[selected_kit][x+60]))
-        content4.append((str(x+1), data[selected_kit][x+72].split(os.sep)[-1], data[selected_kit][x+84]))
+    # for x in range(12):
+    #     content1.append((str(x+1), data[selected_kit][x].split(os.sep)[-1], data[selected_kit][x+12]))
+    #     content2.append((str(x+1), data[selected_kit][x+24].split(os.sep)[-1], data[selected_kit][x+36]))
+    #     content3.append((str(x+1), data[selected_kit][x+48].split(os.sep)[-1], data[selected_kit][x+60]))
+    #     content4.append((str(x+1), data[selected_kit][x+72].split(os.sep)[-1], data[selected_kit][x+84]))
 
-    for idx, x in enumerate(content1):
-        sp1_tree.insert('', 'end', values=content1[idx])
-        sp2_tree.insert('', 'end', values=content2[idx])
-        sp3_tree.insert('', 'end', values=content3[idx])
-        sp4_tree.insert('', 'end', values=content4[idx])
+    # for idx, x in enumerate(content1):
+    #     sp1_tree.insert('', 'end', values=content1[idx])
+    #     sp2_tree.insert('', 'end', values=content2[idx])
+    #     sp3_tree.insert('', 'end', values=content3[idx])
+    #     sp4_tree.insert('', 'end', values=content4[idx])
 
 
 def update_tree(tree, offset):
     tree.delete(*tree.get_children())
-
     content = []
     for x in range(12):
         content.append((str(x+1), data[selected_kit][x+offset].split(os.sep)[-1], data[selected_kit][x+12+offset]))
 
-    for x in content:
-        tree.insert('', 'end', values=x)
+    for i, x in enumerate(content):
+        if content[i][1] != '':
+            if i % 2:
+                tree.insert('', 'end', values=x, tags='odd')
+            else:
+                tree.insert('', 'end', values=x, tags='even')
+        else:
+            tree.insert('', 'end', values=x, tags='empty')
 
-file_type = ['wav', 'mp3', 'ogg']
+file_type = ['.wav', '.mp3', '.ogg']
 
 def generate_tree(path,parent,tree):    
     for p in reversed(sorted(os.listdir(path))):
         abspath = os.path.join(path, p)
-        file_ext = p.split('.')[-1]
+        file_ext = os.path.splitext(p)[1]
+        # file_ext = p.split('.')[-1]
         if file_ext in file_type:
             global idx
             idx = idx + 1
@@ -151,9 +166,13 @@ def generate_tree(path,parent,tree):
             generate_tree(abspath, parent_element, tree)
 
 
+# window = ttk.Window(themename="superhero")
 window = Tk()
-window.geometry('1000x680+700+200')
+window.geometry('1230x680+300+200')
 window.resizable(False, False)
+window.title("Rample Kit Generator")
+# s = ttk.Style()
+# s.theme_use('default')
 # window.configure(bg='black')
 # window.columnconfigure(0, weight=1)
 # window.columnconfigure(1, weight=1)
@@ -183,25 +202,30 @@ explorer_tree.column("#0",minwidth=1000, width=300, stretch=True)
 # init_path = os.getcwd()
 # create_explorer_tree(init_path)
 
-columns = ('kit', 'tag')
+columns = ('kit', 'tag', 'export')
 
 kits_tree = ttk.Treeview(window, columns=columns, show='headings', height=12)
 
 kits_tree.heading("#0", text="Kits")
 kits_tree.heading('kit', text='Kit')
 kits_tree.heading('tag', text='Tag')
+kits_tree.heading('export', text='Export')
 
-kits_tree.column("kit", minwidth=0, width=50, stretch=NO)
-kits_tree.column("tag", minwidth=0, width=100, stretch=NO)
+kits_tree.column("kit", minwidth=0, width=35, stretch=NO)
+kits_tree.column("tag", minwidth=0, width=125, stretch=NO)
+kits_tree.column("export", minwidth=0, width=125, stretch=NO)
+
 kits = []
-alpha = list(string.ascii_uppercase)
-for a in alpha:
-    for x in range(20):
-        kits.append((a + str(x), ''))
+# alpha = list(string.ascii_uppercase)
+# for a in alpha:
+#     for x in range(20):
+#         kits.append((a + str(x), ''))
+for x in range(20*26):
+    kits.append((x, '', ''))
 
-data_path = os.getcwd() + '/kit_data.pkl'
+data_path = os.path.join(os.getcwd(), 'kit_data.pkl')
 if os.path.exists(data_path):
-    with open(os.getcwd() + '/kit_data.pkl', 'rb') as handle:
+    with open(data_path, 'rb') as handle:
         data = pickle.load(handle)
         init_path = data['memory'][0]
         if not os.path.exists(init_path):
@@ -211,20 +235,40 @@ else:
     for e in kits:
         data[e[0]] = ['']*12*2*4
         data[e[0]].append('')
+        data[e[0]].append('')
 
     
     data['memory'] = [os.getcwd()]
     init_path = data['memory'][0]
-    with open(os.getcwd() + '/kit_data.pkl', 'wb') as handle:
+    with open(data_path, 'wb') as handle:
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 create_explorer_tree(init_path)
 
-for i in kits:
-    x = list(i)
-    x[-1] = data[i[0]][-1]
-    kits_tree.insert('', 'end', values=x) #text=str(i))
+def set_kit_color(kit):
+    count = 0
+    for idx, e in enumerate(data[kit]):
+        if idx < 12*2*4 and e == '':
+            count = count + 1
+    
+    if count < 12*2*4:
+        if kit % 2:
+            kits_tree.item(kits_tree.focus(), tags='not_empty_odd')
+            return 'not_empty_odd'
+        else:
+            kits_tree.item(kits_tree.focus(), tags='not_empty_even')
+            return 'not_empty_even'
+    else:
+        kits_tree.item(kits_tree.focus(), tags='empty')
+        return 'empty'
+
+
+for idx, k in enumerate(kits):
+    x = list(k)
+    x[-1] = data[k[0]][-1]
+    x[-2] = data[k[0]][-2]
+    kits_tree.insert('', 'end', values=x, tags=set_kit_color(idx)) #text=str(i))
 
 vsb2 = ttk.Scrollbar(window, orient="vertical", command=kits_tree.yview)
 kits_tree.configure(yscrollcommand=vsb2.set)
@@ -244,8 +288,8 @@ def create_sample_tree():
     tree.heading('path', text='Rename')
     tree.heading('layer', text='#')
 
-    tree.column("name", minwidth=0, width=100, stretch=NO)
-    tree.column("path", minwidth=0, width=100, stretch=NO)
+    tree.column("name", minwidth=0, width=250, stretch=NO)
+    tree.column("path", minwidth=0, width=0, stretch=NO)
     tree.column("layer", minwidth=0, width=25, stretch=NO)
 
     # content = []
@@ -274,16 +318,16 @@ vsb2.grid(row=1, column=1, rowspan=3, sticky='ens')
 from tkinter import font
 label_font = font.Font(weight="bold")
 
-Label(window, text="SP1").grid(row=0,column=5)
+Label(window, text="SP1 (A)").grid(row=0,column=5)
 sp1_tree.grid(row=1,column=5,sticky=tk.N, padx=padding,pady=padding)
 
-Label(window, text="SP2").grid(row=0,column=6)
+Label(window, text="SP2 (Z)").grid(row=0,column=6)
 sp2_tree.grid(row=1,column=6,sticky=tk.N, padx=padding,pady=padding)
 
-Label(window, text="SP3").grid(row=2,column=5, sticky='s')
+Label(window, text="SP3 (E)").grid(row=2,column=5, sticky='s')
 sp3_tree.grid(row=3,column=5,sticky=tk.N, padx=padding,pady=padding)
 
-Label(window, text="SP4").grid(row=2,column=6, sticky='s')
+Label(window, text="SP4 (R)").grid(row=2,column=6, sticky='s')
 sp4_tree.grid(row=3,column=6,sticky=tk.N, padx=padding,pady=padding)
 
 Label(window, text="RAMPLE kit generator", font=label_font).grid(row=0,column=2, sticky='s')
@@ -311,7 +355,8 @@ def browse_button():
         create_explorer_tree(filename)
         init_path = filename
         data['memory'][0] = init_path
-        with open(os.getcwd() + '/kit_data.pkl', 'wb') as handle:
+        p = os.path.join(os.getcwd(), 'kit_data.pkl')
+        with open(p, 'wb') as handle:
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 def copy_sample(layer, order, source, dest, new_name):
@@ -324,33 +369,37 @@ def copy_sample(layer, order, source, dest, new_name):
 
 def save_button():
 
-    with open(os.getcwd() + '/kit_data.pkl', 'wb') as handle:
+    with open(os.path.join(os.getcwd(), 'kit_data.pkl'), 'wb') as handle:
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     save_path = os.getcwd()
-    if os.path.exists(save_path + "/kits/"):
-        shutil.rmtree(save_path + '/kits/')
+    if os.path.exists(os.path.join(save_path, 'kits', '')):
+        shutil.rmtree(os.path.join(save_path, 'kits', ''))
 
     for e in data:
         if e == 'memory':
             continue
 
-        count = 0
-        for s in data[e]:
-            if s == '':
-                count = count + 1
+        
+        to_save = data[e][-1]
+        # count = 0
+        # for s in data[e]:
+        #     if s == '':
+        #         count = count + 1
 
-        if count < 12*2*4:
-            if not os.path.exists(save_path + "/kits"):
-                os.makedirs(save_path + "/kits")
-            if not os.path.exists(save_path + "/kits/" + e):
-                os.makedirs(save_path + "/kits/" + e)
+        # if count < 12*2*4:
+        if to_save != '':
+            if not os.path.exists(os.path.join(save_path, 'kits', '')):
+                os.makedirs(os.path.join(save_path, 'kits', ''))
+            if not os.path.exists(os.path.join(save_path, 'kits', to_save, '')):
+                os.makedirs(os.path.join(save_path, 'kits', to_save, ''))
             # clear folder before saving
             for i in range(12):
-                copy_sample(1, i, data[e][i], save_path + "/kits/" + e + "/", data[e][i+12])
-                copy_sample(2, i, data[e][i+24], save_path + "/kits/" + e + "/", data[e][i+36])
-                copy_sample(3, i, data[e][i+46], save_path + "/kits/" + e + "/", data[e][i+60])
-                copy_sample(4, i, data[e][i+72], save_path + "/kits/" + e + "/", data[e][i+84])
+                p = os.path.join(save_path, 'kits', to_save, '')
+                copy_sample(1, i, data[e][i], p, data[e][i+12])
+                copy_sample(2, i, data[e][i+24], p, data[e][i+36])
+                copy_sample(3, i, data[e][i+48], p, data[e][i+60])
+                copy_sample(4, i, data[e][i+72], p, data[e][i+84])
 
     now = datetime.now()
     timestamp.set("Last save: " + now.strftime("%H:%M:%S"))
@@ -387,8 +436,9 @@ def select_layer(event):
         sa.stop_all()
         snd, samplerate = sf.read(sample)
 
-        sf.write(os.getcwd() + '/tmp.wav', snd, samplerate, subtype='PCM_16')
-        wave_obj = sa.WaveObject.from_wave_file(os.getcwd() + '/tmp.wav')
+        tmp = os.path.join(os.getcwd(), 'tmp.wav')
+        sf.write(tmp, snd, samplerate, subtype='PCM_16')
+        wave_obj = sa.WaveObject.from_wave_file(tmp)
         wave_obj.play()
 
 def delete_layer(event):
@@ -409,6 +459,15 @@ def delete_layer(event):
     data[selected_kit][int(value)+offset-1] = ''
     data[selected_kit][int(value)+offset-1+12] = ''
     update_tree(tree, offset)
+    set_kit_color(selected_kit)
+
+
+def mouse_wheel(event):
+    # respond to Linux or Windows wheel event
+    if event.num == 5 or event.delta == -120:
+        mouse_wheel_down(event)
+    if event.num == 4 or event.delta == 120:
+        mouse_wheel_up(event)
 
 def mouse_wheel_up(event):
     tree = event.widget
@@ -487,6 +546,26 @@ def enter(event):
         selected_layer = 0
 
 
+kits_tree.tag_configure('not_empty_odd', background='#ffd42a')
+kits_tree.tag_configure('not_empty_even', background='#ffe680')
+kits_tree.tag_configure('empty', background='#FFFFFF')
+
+sp1_tree.tag_configure('odd', background='#5fd3bc')
+sp1_tree.tag_configure('even', background='#afe9dd')
+sp1_tree.tag_configure('empty', background='#ffffff')
+
+sp2_tree.tag_configure('odd', background='#5fbcd3')
+sp2_tree.tag_configure('even', background='#afdde9')
+sp2_tree.tag_configure('empty', background='#ffffff')
+
+sp3_tree.tag_configure('odd', background='#8dd35f')
+sp3_tree.tag_configure('even', background='#c6e9af')
+sp3_tree.tag_configure('empty', background='#ffffff')
+
+sp4_tree.tag_configure('odd', background='#de87aa')
+sp4_tree.tag_configure('even', background='#e9afc6')
+sp4_tree.tag_configure('empty', background='#ffffff')
+
 explorer_tree.bind('<<TreeviewSelect>>', explorer_select)
 kits_tree.bind('<<TreeviewSelect>>', kit_select)
 kits_tree.bind('<Double-1>', edit)
@@ -494,8 +573,9 @@ for e in sp_trees:
     e.bind('<Double-1>', edit)
     e.bind('<Button-1>', select_layer)
     e.bind('<Button-3>', delete_layer)
-    e.bind('<Button-4>', mouse_wheel_up)
-    e.bind('<Button-5>', mouse_wheel_down)
+    e.bind('<MouseWheel>', mouse_wheel)
+    e.bind('<Button-4>', mouse_wheel)
+    e.bind('<Button-5>', mouse_wheel)
     e.bind('<Enter>', enter)
 
 def insert_sample(tree):
@@ -523,12 +603,15 @@ def insert_sample(tree):
         if count == 12:
             print(msg + 'FULL')
 
+    set_kit_color(selected_kit)
+
+
 def key_pressed(event):
     if not text_editing:
         match event.keysym:
-            case 'a':
+            case 'a' | 'q':
                 insert_sample(sp1_tree)
-            case 'z':
+            case 'z' | 'w':
                 insert_sample(sp2_tree)
             case 'e':
                 insert_sample(sp3_tree)
