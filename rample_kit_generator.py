@@ -318,10 +318,10 @@ vsb2.grid(row=1, column=1, rowspan=3, sticky='ens')
 from tkinter import font
 label_font = font.Font(weight="bold")
 
-Label(window, text="SP1 (A)").grid(row=0,column=5)
+Label(window, text="SP1 (A,Q)").grid(row=0,column=5)
 sp1_tree.grid(row=1,column=5,sticky=tk.N, padx=padding,pady=padding)
 
-Label(window, text="SP2 (Z)").grid(row=0,column=6)
+Label(window, text="SP2 (Z,W)").grid(row=0,column=6)
 sp2_tree.grid(row=1,column=6,sticky=tk.N, padx=padding,pady=padding)
 
 Label(window, text="SP3 (E)").grid(row=2,column=5, sticky='s')
@@ -332,7 +332,7 @@ sp4_tree.grid(row=3,column=6,sticky=tk.N, padx=padding,pady=padding)
 
 Label(window, text="RAMPLE kit generator", font=label_font).grid(row=0,column=2, sticky='s')
 
-help_text = Label(window, text="A, Z, E and R: copy sample to SP1, SP2, SP3, SP4\nMouse wheel: move sample in sample track\nRight click: remove sample from sample track", justify='left', fg='#000000').grid(row=5,column=0, columnspan=4, sticky='w', padx=padding, pady=padding)
+help_text = Label(window, text="A (Q), Z (W), E and R: copy sample to SP1, SP2, SP3, SP4\nMouse wheel: move sample in sample track\nRight click: remove sample from sample track", justify='left', fg='#000000').grid(row=5,column=0, columnspan=4, sticky='w', padx=padding, pady=padding)
 
 
 from datetime import datetime
