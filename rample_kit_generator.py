@@ -11,6 +11,8 @@ from tkinter import filedialog
 import shutil
 import pickle
 import soundfile as sf
+# import ttkbootstrap as ttk
+# from ttkbootstrap.constants import *
 
 idx = 0
 selected_kit = 0
@@ -164,9 +166,13 @@ def generate_tree(path,parent,tree):
             generate_tree(abspath, parent_element, tree)
 
 
+# window = ttk.Window(themename="superhero")
 window = Tk()
 window.geometry('1230x680+300+200')
 window.resizable(False, False)
+window.title("Rample Kit Generator")
+# s = ttk.Style()
+# s.theme_use('default')
 # window.configure(bg='black')
 # window.columnconfigure(0, weight=1)
 # window.columnconfigure(1, weight=1)
@@ -603,9 +609,9 @@ def insert_sample(tree):
 def key_pressed(event):
     if not text_editing:
         match event.keysym:
-            case 'a':
+            case 'a' | 'q':
                 insert_sample(sp1_tree)
-            case 'z':
+            case 'z' | 'w':
                 insert_sample(sp2_tree)
             case 'e':
                 insert_sample(sp3_tree)
