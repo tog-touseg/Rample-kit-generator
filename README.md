@@ -26,8 +26,6 @@ Following dependencies are required:
 
 - natsort
 
-- 
-
 - soundfile
 
 ![Image](rkg.png?raw=true)
