@@ -26,15 +26,9 @@ Following dependencies are required:
 
 - natsort
 
-- shutil
-
-- pickle
+- 
 
 - soundfile
-
-- sys
-
-- os
 
 ![Image](rkg.png?raw=true)
 
