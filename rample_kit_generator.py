@@ -14,7 +14,7 @@ import soundfile as sf
 import sys
 # import ttkbootstrap as ttk
 # from ttkbootstrap.constants import *
-
+ 
 idx = 0
 selected_kit = 0
 selected_sample = ''
