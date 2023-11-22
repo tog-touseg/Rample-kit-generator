@@ -27,5 +27,5 @@ Following dependencies are required:
 ## Usage
 
 ```markdown
-![Image](rkg.png)
+![Image](rkg.png?raw=true)
 ```
