@@ -11,6 +11,7 @@ from tkinter import filedialog
 import shutil
 import pickle
 import soundfile as sf
+import sys
 # import ttkbootstrap as ttk
 # from ttkbootstrap.constants import *
 
@@ -22,6 +23,11 @@ orig_file = ''
 selected_layer = ''
 init_path = ''
 text_editing = False
+
+if getattr(sys, 'frozen', False):
+    wd = os.path.dirname(sys.executable)
+elif __file__:
+    wd = os.path.dirname(__file__)
 
 def edit(event):
     tree = event.widget
@@ -82,7 +88,7 @@ def explorer_select(event):
     if 'sample' in tags:
         sa.stop_all()
         snd, samplerate = sf.read(tags[1])
-        tmp = os.path.join(os.getcwd(), 'tmp.wav')
+        tmp = os.path.join(wd, 'tmp.wav')
         sf.write(tmp, snd, samplerate, subtype='PCM_16')
         wave_obj = sa.WaveObject.from_wave_file(tmp)
         wave_obj.play()
@@ -199,7 +205,7 @@ explorer_tree.column("#0",minwidth=1000, width=300, stretch=True)
 # explorer_tree.column("#0", stretch=False)
 
 # init_path = '/home/morgane/Bureau/Pulsar_23_Samples'
-# init_path = os.getcwd()
+# init_path = wd
 # create_explorer_tree(init_path)
 
 columns = ('kit', 'tag', 'export')
@@ -223,13 +229,13 @@ kits = []
 for x in range(20*26):
     kits.append((x, '', ''))
 
-data_path = os.path.join(os.getcwd(), 'kit_data.pkl')
+data_path = os.path.join(wd, 'kit_data.pkl')
 if os.path.exists(data_path):
     with open(data_path, 'rb') as handle:
         data = pickle.load(handle)
         init_path = data['memory'][0]
         if not os.path.exists(init_path):
-            init_path = os.getcwd()
+            init_path = wd
 else:
     data = {}
     for e in kits:
@@ -238,7 +244,7 @@ else:
         data[e[0]].append('')
 
     
-    data['memory'] = [os.getcwd()]
+    data['memory'] = [wd]
     init_path = data['memory'][0]
     with open(data_path, 'wb') as handle:
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -355,7 +361,7 @@ def browse_button():
         create_explorer_tree(filename)
         init_path = filename
         data['memory'][0] = init_path
-        p = os.path.join(os.getcwd(), 'kit_data.pkl')
+        p = os.path.join(wd, 'kit_data.pkl')
         with open(p, 'wb') as handle:
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -369,10 +375,10 @@ def copy_sample(layer, order, source, dest, new_name):
 
 def save_button():
 
-    with open(os.path.join(os.getcwd(), 'kit_data.pkl'), 'wb') as handle:
+    with open(os.path.join(wd, 'kit_data.pkl'), 'wb') as handle:
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    save_path = os.getcwd()
+    save_path = wd
     if os.path.exists(os.path.join(save_path, 'kits', '')):
         shutil.rmtree(os.path.join(save_path, 'kits', ''))
 
@@ -436,7 +442,7 @@ def select_layer(event):
         sa.stop_all()
         snd, samplerate = sf.read(sample)
 
-        tmp = os.path.join(os.getcwd(), 'tmp.wav')
+        tmp = os.path.join(wd, 'tmp.wav')
         sf.write(tmp, snd, samplerate, subtype='PCM_16')
         wave_obj = sa.WaveObject.from_wave_file(tmp)
         wave_obj.play()
