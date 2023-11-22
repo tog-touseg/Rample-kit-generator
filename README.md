@@ -1,12 +1,21 @@
 # Rample kit generator
 
-Modules used:
+Launch script with python3 rample-kit-generator.py . For **windows** users you can find a .exe file in the bin folder
 
-tkinter
-os
-simpleaudio as sa
-natsort
-shutil
-pickle
-soundfile
-sys
+Following dependencies are required:
+
+- tkinter
+
+- simpleaudio
+
+- natsort
+
+- shutil
+
+- pickle
+
+- soundfile
+
+- sys
+
+- os
