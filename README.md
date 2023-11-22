@@ -27,5 +27,5 @@ Following dependencies are required:
 ## Usage
 
 ```markdown
-![rkg_usage](https://github.com/tog-touseg/Rample-kit-generator/blob/main/rkg.png?raw=true "RKG usage")
+![Image](rkg.png)
 ```
