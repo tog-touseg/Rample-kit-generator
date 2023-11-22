@@ -26,6 +26,4 @@ Following dependencies are required:
 
 ## Usage
 
-```markdown
 ![Image](rkg.png?raw=true)
-```
